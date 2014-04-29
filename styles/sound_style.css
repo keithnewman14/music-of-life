@@ -1,0 +1,30 @@
+/*
+Affects all HTML items that are a <button> tag
+*/
+button{
+    color: #56c330;
+}
+
+/*
+Affects the HTML item with the given ID (only 1 HTML item per page can have a given ID)
+
+for example, the difference between
+<p>
+and
+<p id="button2">
+*/
+#button2{
+    color: #c3100f;
+}
+
+/*
+Affects all HTML items with a given class (use this if individual IDs are insufficient)
+
+for example, the difference between
+<p>
+and
+<p class="sample_class_name">
+*/
+.sample_class_name{
+    color: #ffffff;
+}
