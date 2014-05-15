@@ -24,13 +24,18 @@ i.e.
 alert("hello world!");
 > creates a popup window that says "hello world!"
  */
+    var snd = new Audio("sounds/a_sharp1.wav"); // buffers automatically when created
+    var snd2 = new Audio("sounds/c_sharp1.wav"); // buffers automatically when created
+
 $("#button1").click(function(){
-    console.log("clicked button 1!");
+    snd.play();
+
 });
 
 $("#button2").click(function(){
     var test_string = "this is a test string!";
     console.log("clicked button 2! " + test_string);
+    snd2.play();
 });
 
 $("#button3").click(function(){

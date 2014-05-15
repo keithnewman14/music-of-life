@@ -8,6 +8,8 @@ var total_num_rounds = 0; //The total number of rounds selected for this run of 
 var round = 0; //Tracks the current round of the game
 var game_interval = {}; //Empty object that is populated by a setInterval(..) object to control game pace
 
+var game_array = {};
+
 var live_color = "#474747";
 var dead_color = "#e0e0e0";
 var live_highlight = "#2b2b2b";
@@ -19,6 +21,10 @@ var dead_highlight = "#b8b8b8";
  * @param node      DOM object      The node to make live
  */
 function makeLive(node){
+    var xy_array = node.id.split('-');
+    var x = parseInt(xy_array[0])-1;
+    var y = parseInt(xy_array[1])-1;
+    game_array[x][y] = true;
     $(node).animate({
         backgroundColor: live_color
     })
@@ -32,6 +38,10 @@ function makeLive(node){
  * @param node      DOM object      The node to kill
  */
 function makeDead(node){
+    var xy_array = node.id.split('-');
+    var x = parseInt(xy_array[0])-1;
+    var y = parseInt(xy_array[1])-1;
+    game_array[x][y] = false;
     $(node).animate({
         backgroundColor: dead_color
     });
@@ -81,6 +91,20 @@ function unhighlightColor(){
 }
 
 /**
+ * Returns an array containing which nodes are alive in the given column
+ * @param column
+ */
+function findNotesToPlay(column){
+    var notes_to_play = [];
+    for(var i=0; i<total_height; i++){
+        if(game_array[column][i]){
+            notes_to_play.push(i);
+        }
+    }
+    return notes_to_play;
+}
+
+/**
  * A timestep of the game, which
  * 1) populates the currently_alive_timestep with all live nodes in this timestep
  * 2) Finds every node that should be checked this timestep
@@ -90,37 +114,42 @@ function unhighlightColor(){
 function timestep(){
     console.log("Round..." + round);
     if(run_game && round < total_num_rounds){
+        var notes_to_play = findNotesToPlay(round%16);
+        console.log(notes_to_play);
 
-        currently_alive_timestep = {};
-        for(var node_id in currently_alive){
-            currently_alive_timestep[node_id] = true;
-        }
-
-        var nodes_to_check = compileNodesToCheck();
-
-        for (var node_id in nodes_to_check){
-
-            var surrounding_live_count = countSurroundingLiveNodes(node_id);
-            var node = document.getElementById(node_id);
-            var is_alive = node.className == "alive";
-
-            if (is_alive && surrounding_live_count<2){
-                makeDead(node);
+        if(((round+1)%16)===0){
+            currently_alive_timestep = {};
+            for(var node_id in currently_alive){
+                currently_alive_timestep[node_id] = true;
             }
-            else if (is_alive && (surrounding_live_count==2 || surrounding_live_count==3)){
-                makeLive(node);
-            }
-            else if (is_alive &&surrounding_live_count > 3){
-                makeDead(node);
-            }
-            else if(!is_alive && surrounding_live_count == 3) {
-                makeLive(node);
-            }
-            else {}
 
-            delete nodes_to_check[node_id];
+            var nodes_to_check = compileNodesToCheck();
+
+            for (var node_id in nodes_to_check){
+
+                var surrounding_live_count = countSurroundingLiveNodes(node_id);
+                var node = document.getElementById(node_id);
+                var is_alive = node.className == "alive";
+
+                if (is_alive && surrounding_live_count<2){
+                    makeDead(node);
+                }
+                else if (is_alive && (surrounding_live_count==2 || surrounding_live_count==3)){
+                    makeLive(node);
+                }
+                else if (is_alive &&surrounding_live_count > 3){
+                    makeDead(node);
+                }
+                else if(!is_alive && surrounding_live_count == 3) {
+                    makeLive(node);
+                }
+                else {}
+
+                delete nodes_to_check[node_id];
+            }
         }
         round++;
+
     }
     else{
        window.clearInterval(game_interval);
@@ -198,12 +227,32 @@ $( "body" ).click(function( event ) {
 });
 
 /**
+ * Creates a 2D array of the board, allowing for easy access during music checking
+ */
+function create2DArray(width, height, default_val){
+    var b = [];
+    for(var j=0; j<width; j++){
+        var a2 = createColumn(height, default_val);
+        b.push(a2);
+    }
+    return b;
+}
+
+function createColumn(size, default_val){
+    var a = [];
+    for(var i=0; i<size; i++){
+        a.push(default_val);
+    }
+    return a;
+}
+
+/**
  * Creates a new board, based on the input of # of rows and # of columns
  */
-function generateBoard(){
-    var width = document.getElementById("width").value;
+$(document).ready(function(){
+    var width = 16;
     total_width = width;
-    var height = document.getElementById("height").value;
+    var height = 16;
     total_height = height;
     var board = document.getElementById("board");
     $("#board").html("");
@@ -223,7 +272,9 @@ function generateBoard(){
         }
         board.appendChild(row);
     }
-}
+
+    game_array = create2DArray(width, height, false);
+});
 
 /**
  *
@@ -232,7 +283,7 @@ function generateBoard(){
  * @param   status    bool    Whether the input should be disabled or not
  */
 function toggleInput(status){
-    var attributes = new Array("width", "height", "new_board", "num_rounds");
+    var attributes = new Array("num_rounds");
     for(var attr in attributes){
         document.getElementById(attributes[attr]).disabled = status;
     }
