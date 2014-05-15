@@ -24,11 +24,23 @@ i.e.
 alert("hello world!");
 > creates a popup window that says "hello world!"
  */
-    var snd = new Audio("sounds/a_sharp1.wav"); // buffers automatically when created
-    var snd2 = new Audio("sounds/c_sharp1.wav"); // buffers automatically when created
+    var snd1 = new Audio("sounds/c_sharp1.wav");
+    var snd2 = new Audio("sounds/d_sharp1.wav");
+    var snd3 = new Audio("sounds/f_sharp1.wav");
+    var snd4 = new Audio("sounds/g_sharp1.wav");
+    var snd5 = new Audio("sounds/a_sharp1.wav");
+    var snd6 = new Audio("sounds/c_sharp2.wav");
+    var snd7 = new Audio("sounds/d_sharp2.wav");
+    var snd8 = new Audio("sounds/f_sharp2.wav");
+    var snd9 = new Audio("sounds/g_sharp1.wav");
+    var snd10 = new Audio("sounds/a_sharp1.wav");
+    var snd11 = new Audio("sounds/c_sharp1.wav");
+    var snd12 = new Audio("sounds/d_sharp1.wav");
 
-$("#button1").click(function(){
-    snd.play();
+    var sound_array = [snd12, snd11, snd10, snd9, snd8, snd7, snd6, snd5, snd4, snd3, snd2, snd1];
+    $("#button1").click(function(){
+        var rand = sound_array[Math.floor(Math.random() * sound_array.length)];
+    rand.play();
 
 });
 

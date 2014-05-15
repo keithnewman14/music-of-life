@@ -10,6 +10,21 @@ var game_interval = {}; //Empty object that is populated by a setInterval(..) ob
 
 var game_array = {};
 
+var snd1 = new Audio("sounds/c_sharp1.wav");
+var snd2 = new Audio("sounds/d_sharp1.wav");
+var snd3 = new Audio("sounds/f_sharp1.wav");
+var snd4 = new Audio("sounds/g_sharp1.wav");
+var snd5 = new Audio("sounds/a_sharp1.wav");
+var snd6 = new Audio("sounds/c_sharp2.wav");
+var snd7 = new Audio("sounds/d_sharp2.wav");
+var snd8 = new Audio("sounds/f_sharp2.wav");
+var snd9 = new Audio("sounds/g_sharp2.wav");
+var snd10 = new Audio("sounds/a_sharp2.wav");
+var snd11 = new Audio("sounds/c_sharp3.wav");
+var snd12 = new Audio("sounds/d_sharp3.wav");
+
+var sound_array = [snd12, snd11, snd10, snd9, snd8, snd7, snd6, snd5, snd4, snd3, snd2, snd1];
+
 var live_color = "#474747";
 var dead_color = "#e0e0e0";
 var live_highlight = "#2b2b2b";
@@ -115,7 +130,9 @@ function timestep(){
     console.log("Round..." + round);
     if(run_game && round < total_num_rounds){
         var notes_to_play = findNotesToPlay(round%16);
-        console.log(notes_to_play);
+        for(var note_index = 0; note_index<notes_to_play.length; note_index++){
+            sound_array[notes_to_play[note_index]].play();
+        }
 
         if(((round+1)%16)===0){
             currently_alive_timestep = {};
@@ -252,7 +269,7 @@ function createColumn(size, default_val){
 $(document).ready(function(){
     var width = 16;
     total_width = width;
-    var height = 16;
+    var height = 12;
     total_height = height;
     var board = document.getElementById("board");
     $("#board").html("");
@@ -307,6 +324,6 @@ function startGame(){
         run_game = true;
         toggleInput(true);
         total_num_rounds = document.getElementById("num_rounds").value;
-        game_interval = setInterval(function(){timestep()},500);
+        game_interval = setInterval(function(){timestep()},200);
     }
 }
