@@ -7,20 +7,22 @@ var total_width = 0; //The total number of columns for this game
 var round = 0; //Tracks the current round of the game
 var game_interval = {}; //Empty object that is populated by a setInterval(..) object to control game pace
 
+var mouse_down = false;
+
 var game_array = {};
 
-var snd1 = new Audio("sounds/c_sharp1.wav");
-var snd2 = new Audio("sounds/d_sharp1.wav");
-var snd3 = new Audio("sounds/f_sharp1.wav");
-var snd4 = new Audio("sounds/g_sharp1.wav");
-var snd5 = new Audio("sounds/a_sharp1.wav");
-var snd6 = new Audio("sounds/c_sharp2.wav");
-var snd7 = new Audio("sounds/d_sharp2.wav");
-var snd8 = new Audio("sounds/f_sharp2.wav");
-var snd9 = new Audio("sounds/g_sharp2.wav");
-var snd10 = new Audio("sounds/a_sharp2.wav");
-var snd11 = new Audio("sounds/c_sharp3.wav");
-var snd12 = new Audio("sounds/d_sharp3.wav");
+var snd1 = new Audio("sounds2/c_sharp1.wav");
+var snd2 = new Audio("sounds2/d_sharp1.wav");
+var snd3 = new Audio("sounds2/f_sharp1.wav");
+var snd4 = new Audio("sounds2/g_sharp1.wav");
+var snd5 = new Audio("sounds2/a_sharp1.wav");
+var snd6 = new Audio("sounds2/c_sharp2.wav");
+var snd7 = new Audio("sounds2/d_sharp2.wav");
+var snd8 = new Audio("sounds2/f_sharp2.wav");
+var snd9 = new Audio("sounds2/g_sharp2.wav");
+var snd10 = new Audio("sounds2/a_sharp2.wav");
+var snd11 = new Audio("sounds2/c_sharp3.wav");
+var snd12 = new Audio("sounds2/d_sharp3.wav");
 
 var sound_array = [snd12, snd11, snd10, snd9, snd8, snd7, snd6, snd5, snd4, snd3, snd2, snd1];
 
@@ -202,21 +204,37 @@ function compileNodesToCheck(){
     return nodes_to_check;
 }
 
-/**
- * Changes the color and class of squares with a mouse click (used for pre-setting a game)
- */
-$( "body" ).click(function( event ) {
-    if(!run_game){
-        var node = event.target;
-        countSurroundingLiveNodes(node.id);
-        if (node.className == "dead"){
-            makeLive(node);
-        }
-        else if (node.className == "alive"){
-            makeDead(node);
-        }
+
+
+$("body").mousedown(function(event){
+    node = event.target;
+    console.log(node.id);
+    if (node.className == "dead"){
+        makeLive(node);
     }
+    else if (node.className == "alive"){
+        makeDead(node);
+    }
+    mouse_down = true;
 });
+
+$("body").mouseup(function(event){
+    mouse_down = false;
+});
+
+$("body").mouseover(function(event){
+   if(mouse_down){
+       node = event.target;
+       if (node.className == "dead"){
+           makeLive(node);
+       }
+   else if (node.className == "alive"){
+           makeDead(node);
+       }
+   }
+});
+
+
 
 /**
  * Creates a 2D array of the board, allowing for easy access during music checking
