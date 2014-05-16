@@ -4,7 +4,6 @@ var currently_alive = {}; //A "set" containing the IDs for all currently live no
 var currently_alive_timestep = {}; //A snapshot of the current board updated at each timestep
 var total_height = 0; //The total number of rows for this game
 var total_width = 0; //The total number of columns for this game
-var total_num_rounds = 0; //The total number of rounds selected for this run of the game
 var round = 0; //Tracks the current round of the game
 var game_interval = {}; //Empty object that is populated by a setInterval(..) object to control game pace
 
@@ -27,8 +26,7 @@ var sound_array = [snd12, snd11, snd10, snd9, snd8, snd7, snd6, snd5, snd4, snd3
 
 var live_color = "#474747";
 var dead_color = "#e0e0e0";
-var live_highlight = "#2b2b2b";
-var dead_highlight = "#b8b8b8";
+var music_color = "#9ed8e8";
 
 /**
  * Takes in a DOM object (i.e. a node in the game) and brings it to life
@@ -42,7 +40,7 @@ function makeLive(node){
     game_array[x][y] = true;
     $(node).animate({
         backgroundColor: live_color
-    })
+    });
     node.className = "alive";
     currently_alive[node.id] = true;
 }
@@ -65,45 +63,17 @@ function makeDead(node){
 
 }
 
-/**
- * Highlights the node that the mouse is currently hovering over
- */
-function highlightColor(){
-    if(!run_game){
-        var node = event.target;
-        var is_alive = node.className == "alive";
-        if(is_alive){
-            $(node).animate({
-                backgroundColor: live_highlight
-            });
-        }
-        else{
-            $(node).animate({
-                backgroundColor: dead_highlight
-            });
-        }
-    }
+function animatePlay(node){
+    console.log("OMG HERE");
+    console.log(node.id);
+    $(node).animate({
+        backgroundColor: music_color
+    }, 100);
+    $(node).animate({
+        backgroundColor: live_color
+    });
 }
 
-/**
- * Returns a node to its original color when mouse moves out of hover range
- */
-function unhighlightColor(){
-    if(!run_game){
-        var node = event.target;
-        var is_alive = node.className == "alive";
-        if(is_alive){
-            $(node).animate({
-                backgroundColor: live_color
-            });
-        }
-        else{
-            $(node).animate({
-                backgroundColor: dead_color
-            });
-        }
-    }
-}
 
 /**
  * Returns an array containing which nodes are alive in the given column
@@ -128,10 +98,15 @@ function findNotesToPlay(column){
  */
 function timestep(){
     console.log("Round..." + round);
-    if(run_game && round < total_num_rounds){
+    if(run_game){
         var notes_to_play = findNotesToPlay(round%16);
         for(var note_index = 0; note_index<notes_to_play.length; note_index++){
             sound_array[notes_to_play[note_index]].play();
+            var music_node_id = ((round%16)+1) + "-" + (notes_to_play[note_index]+1);
+            console.log(music_node_id);
+            var music_node = document.getElementById(music_node_id);
+            animatePlay(music_node);
+
         }
 
         if(((round+1)%16)===0){
@@ -282,8 +257,6 @@ $(document).ready(function(){
             cell.className = "dead";
             var cell_id = col_num + "-" + row_num;
             cell.id = cell_id;
-            cell.onmouseover = function(){highlightColor();};
-            cell.onmouseout = function(){unhighlightColor();};
 
             row.appendChild(cell);
         }
@@ -293,18 +266,6 @@ $(document).ready(function(){
     game_array = create2DArray(width, height, false);
 });
 
-/**
- *
- * Disables input (true) or enables input (false)
- *
- * @param   status    bool    Whether the input should be disabled or not
- */
-function toggleInput(status){
-    var attributes = new Array("num_rounds");
-    for(var attr in attributes){
-        document.getElementById(attributes[attr]).disabled = status;
-    }
-}
 
 /**
  * Changes whether the game is currently running or not
@@ -316,14 +277,11 @@ function startGame(){
         button.value = "Start Game"
         run_game = false;
         round = 0;
-        toggleInput(false);
     }
     else{
         console.log("Game started");
         button.value = "Stop Game"
         run_game = true;
-        toggleInput(true);
-        total_num_rounds = document.getElementById("num_rounds").value;
         game_interval = setInterval(function(){timestep()},200);
     }
 }
